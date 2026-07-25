@@ -1,2 +1,2 @@
 # three.js_Solor_System
-This solor system design with speed control, drag,scroll and right-drag
+This is solor system design in three.js with more controls, (speed control, drag,scroll and right-drag) and realistic textures
