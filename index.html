@@ -1,1 +1,41 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solar System - Three.js (Realistic Textures)</title>
+<link rel="stylesheet" href="./src/css/style.css">
+</head>
+<body>
+<div id="loadingScreen">
+  <div>Loading planetary textures&hellip;</div>
+  <div class="bar"><div class="fill" id="loadFill"></div></div>
+</div>
+
+<div id="info">
+  <b>Solar System (Based on Three.js)</b><br>
+  Drag = rotate view &nbsp; Scroll = zoom &nbsp; Right-drag = pan<br>
+
+</div>
+
+<div id="toggles">
+  <label><input type="checkbox" id="toggleOrbits" checked> Orbit lines</label>
+  <label><input type="checkbox" id="toggleMoons" checked> Moons</label>
+  <label><input type="checkbox" id="toggleBelt" checked> Asteroid belt</label>
+  <label><input type="checkbox" id="toggleLabels" checked> Hover labels</label>
+</div>
+
+<div id="designCredit">design by @KRKRaju</div>
+
+<div id="speedControl">
+  Speed: <input type="range" id="speedSlider" min="0" max="1" step="0.1" value="1" style="vertical-align:middle;">
+  <span id="speedVal">1</span>
+</div>
+<div id="planetLabel"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="./src/js/script.js"></script>
+</body>
+</html>
