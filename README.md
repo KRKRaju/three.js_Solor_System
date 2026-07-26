@@ -4,6 +4,6 @@ This is real time based solar system simulation built with Three.js, featuring a
 
 
 Demo link
-https://nqcsc4.csb.app
+https://nqcsc4.csb.app/
 
 more observe the planets you can change with speed of x.02
