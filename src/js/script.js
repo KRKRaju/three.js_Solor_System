@@ -369,12 +369,12 @@ planetData.forEach(p => {
 });
 
 // ================= Asteroid belt (instanced, between Mars & Jupiter, real AU range ~2.1-3.3 AU) =================
-const ASTEROID_COUNT = 2200;
+const ASTEROID_COUNT = 2800;
 const asteroidGeo = new THREE.IcosahedronGeometry(0.60, 0);
 const asteroidMat = new THREE.MeshStandardMaterial({ color: 0x8a8378, roughness: 1.0 });
 const asteroidBelt = new THREE.InstancedMesh(asteroidGeo, asteroidMat, ASTEROID_COUNT);
 const dummy = new THREE.Object3D();
-const beltInnerR = 140, beltOuterR = 200;
+const beltInnerR = 140, beltOuterR = 250;
 const asteroidSpeeds = [];
 for (let i = 0; i < ASTEROID_COUNT; i++) {
   const r = beltInnerR + Math.random() * (beltOuterR - beltInnerR);
