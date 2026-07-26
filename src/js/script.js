@@ -1,4 +1,3 @@
-
 const resolveAssetPath = (fileName) => {
   return new URL(`./static/${fileName}`, window.location.href).href;
 };
