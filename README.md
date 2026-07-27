@@ -1,4 +1,4 @@
-# three.js_Solor_System
+# Three.js_Solor_System
 Experience the Solar System like never before! This realistic Three.js simulation accelerates time at 1 hour = 1 second or Real Time, allowing you to observe planetary motion in an engaging and interactive way.
 
 Select any planet to instantly focus on it, explore detailed information, and experience real-time shadows and lighting for greater realism. Zoom in to inspect planets up close, control the simulation speed, drag to rotate the camera, scroll to zoom, and use right-drag for free navigation. With realistic textures, accurate orbits, and many more interactive features, there's always something new to discover.
