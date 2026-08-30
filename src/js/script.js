@@ -32,7 +32,7 @@ const TEX_DATA = {
 // ================= Scene / camera / renderer =================
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 50000);
-camera.position.set(0, 220, 480);
+camera.position.set(0, 260, 620);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -131,7 +131,7 @@ sunLight.shadow.mapSize.set(2048, 2048);
 sunLight.shadow.bias = -0.0005;
 sunLight.shadow.radius = 2;
 scene.add(sunLight);
-scene.add(new THREE.AmbientLight(0x404040, 0.08));
+scene.add(new THREE.AmbientLight(0x404040, 0.04));
 
 // ================= Sun =================
 const SUN_RADIUS = 12;
@@ -257,10 +257,10 @@ const planetData = [
   { name: "Jupiter", radius: 11.21 * PLANET_SIZE_SCALE, texture: "jupiter", rotHours: 9.925, tilt: 0.05,
     el: { a: 5.204267, e: 0.048775, i: 1.303, Om: 100.464, w: 14.754, L0: 34.404, periodDays: 4332.59 },
     moons: [
-      { name: "Io",       radius: 0.35 * PLANET_SIZE_SCALE, distanceScale: 1.462, texture: "io",       periodDays: 1.7691 },
-      { name: "Europa",   radius: 0.32 * PLANET_SIZE_SCALE, distanceScale: 1.723, texture: "europa",   periodDays: 3.5512 },
-      { name: "Ganymede", radius: 0.45 * PLANET_SIZE_SCALE, distanceScale: 2.031, texture: "ganymede", periodDays: 7.1546 },
-      { name: "Callisto", radius: 0.42 * PLANET_SIZE_SCALE, distanceScale: 2.369, texture: "callisto", periodDays: 16.689 }
+      { name: "Io",       radius: 0.48 * PLANET_SIZE_SCALE, distanceScale: 1.85, texture: "io",       periodDays: 1.7691 },
+      { name: "Europa",   radius: 0.44 * PLANET_SIZE_SCALE, distanceScale: 2.15, texture: "europa",   periodDays: 3.5512 },
+      { name: "Ganymede", radius: 0.62 * PLANET_SIZE_SCALE, distanceScale: 2.55, texture: "ganymede", periodDays: 7.1546 },
+      { name: "Callisto", radius: 0.58 * PLANET_SIZE_SCALE, distanceScale: 2.95, texture: "callisto", periodDays: 16.689 }
     ] },
 
   { name: "Saturn", radius: 11.45 * PLANET_SIZE_SCALE, texture: "saturn", rotHours: 10.656, tilt: 0.47,
@@ -303,6 +303,10 @@ planetData.forEach(p => {
   scene.add(orbitLine);
 
   const mat = createPlanetMaterial(p.texture);
+    // Darken Earth's shadowed side by reducing emissive contribution on its material
+  if (p.name === "Earth") {
+    mat.emissiveIntensity = 0.12;
+  }
   const mesh = new THREE.Mesh(new THREE.SphereGeometry(p.radius, 48, 48), mat);
   mesh.rotation.z = p.tilt;
   mesh.castShadow = true;
@@ -310,8 +314,14 @@ planetData.forEach(p => {
   scene.add(mesh);
 
   if (p.cloudsTexture) {
-    const cloudMat = new THREE.MeshBasicMaterial({
-      map: loadTex(p.cloudsTexture), transparent: true, opacity: 0.55, depthWrite: false
+    // Use a lit material for clouds so they darken in the planet's shadow
+    const cloudMat = new THREE.MeshStandardMaterial({
+      map: loadTex(p.cloudsTexture),
+      transparent: true,
+      opacity: 0.55,
+      depthWrite: false,
+      roughness: 0.85,
+      metalness: 0.0,
     });
     const clouds = new THREE.Mesh(new THREE.SphereGeometry(p.radius * 1.02, 48, 48), cloudMat);
     mesh.add(clouds);
@@ -346,6 +356,7 @@ planetData.forEach(p => {
     ringMesh.rotation.x = Math.PI / 2 - 0.4;
     ringMesh.position.y = 0.01; // offset slightly above the planet surface to avoid z-fighting
     ringMesh.renderOrder = 1;
+    ringMesh.userData.isRing = true;
     mesh.add(ringMesh);
   }
 
@@ -354,13 +365,19 @@ planetData.forEach(p => {
     const mPivot = new THREE.Object3D();
     mPivot.rotation.y = Math.random() * Math.PI * 2; // arbitrary starting phase (real phase per-moon not modeled)
     mesh.add(mPivot);
-    const mMat = new THREE.MeshStandardMaterial({ map: loadTex(m.texture), roughness: 0.9 });
+    const mMat = new THREE.MeshStandardMaterial({
+      map: loadTex(m.texture),
+      roughness: 0.95,
+      emissive: 0xf2f0e8,
+      emissiveIntensity: 0.04,
+      emissiveMap: loadTex(m.texture),
+    });
     const mMesh = new THREE.Mesh(new THREE.SphereGeometry(m.radius, 20, 20), mMat);
     const moonDistance = (m.distanceScale || m.distance) * p.radius;
     mMesh.position.x = moonDistance;
     mMesh.castShadow = true;
     mMesh.receiveShadow = true;
-    mMesh.add(createMoonGlow(m.radius));
+    mMesh.add(createMoonGlow(m.radius, 2.0, 0.045));
     mPivot.add(mMesh);
     moonMeshes.push({ pivot: mPivot, mesh: mMesh, data: m });
   });
@@ -374,14 +391,14 @@ const asteroidGeo = new THREE.IcosahedronGeometry(0.60, 0);
 const asteroidMat = new THREE.MeshStandardMaterial({ color: 0x8a8378, roughness: 1.0 });
 const asteroidBelt = new THREE.InstancedMesh(asteroidGeo, asteroidMat, ASTEROID_COUNT);
 const dummy = new THREE.Object3D();
-const beltInnerR = 140, beltOuterR = 250;
+const beltInnerR = 120, beltOuterR = 250;
 const asteroidSpeeds = [];
 for (let i = 0; i < ASTEROID_COUNT; i++) {
   const r = beltInnerR + Math.random() * (beltOuterR - beltInnerR);
   const theta = Math.random() * Math.PI * 2;
   const y = (Math.random() - 0.5) * 2.2;
   dummy.position.set(Math.cos(theta) * r, y, Math.sin(theta) * r);
-  const s = 0.4 + Math.random() * 1.6;
+  const s = 0.5 + Math.random() * 2.1;
   dummy.scale.setScalar(s);
   dummy.rotation.set(Math.random()*6, Math.random()*6, Math.random()*6);
   dummy.updateMatrix();
@@ -485,7 +502,7 @@ if (toggleClickToFocus) {
 // simTime advances in real ms; secondsPerRealSecond controls how many
 // simulated seconds pass per real second (0 = wall-clock real time).
 let simTime = new Date(); // starts at the real "now"
-let secondsPerRealSecond = 86400; // default: 1 sim day per real second
+let secondsPerRealSecond = 3600; // default: 1 sim day per real second
 let paused = false;
 
 const simDateEl = document.getElementById('simDate');
